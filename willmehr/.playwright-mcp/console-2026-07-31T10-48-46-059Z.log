@@ -1,0 +1,7 @@
+[     589ms] [WARNING]  [33m[1m⚠[22m[39m Runtime config is deprecated and will be removed in Next.js 16. Please remove the usage of "next/config" from your project. @ https://www.willhaben.at/bbx-search/_next/static/chunks/pages/_app-ec4407c593faad12.js:819
+[     927ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cache.willhaben.at/mmo/4/150/543/7774_-1016820836_thumb.jpg:0
+[     927ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cache.willhaben.at/mmo/4/150/543/7774_-223201027_thumb.jpg:0
+[     965ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cache.willhaben.at/mmo/4/150/543/7774_-2028292677_thumb.jpg:0
+[    1549ms] [WARNING] Permutive was not initialized. No consent to run on the page @ https://www.willhaben.at/bbx-search/_next/static/chunks/pages/_app-ec4407c593faad12.js:6
+[    1635ms] [INFO] AST library loaded: 1.10.105 @ https://www.willhaben.at/bbx-search/_next/static/chunks/pages/_app-ec4407c593faad12.js:6
+[    1639ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://www.willhaben.at/iad/kaufen-und-verkaufen/d/la-sportiva-skwama-lite-kletterschuhe-1505437774/:0

@@ -1,0 +1,31 @@
+{
+  "name": "willmehr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server for hunting deals on willhaben.at",
+  "type": "module",
+  "bin": {
+    "willmehr": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx scripts/smoke.ts",
+    "session": "tsx scripts/session.ts",
+    "check:auth": "tsx scripts/check-auth.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.8.0"
+  }
+}
