@@ -1,0 +1,60 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.taneron/kleinanzeigen",
+  "description": "Search Kleinanzeigen.de, Germany's largest classifieds site, for second-hand listings",
+  "status": "active",
+  "version": "0.1.0",
+  "website_url": "https://github.com/taneron/willmehr#kleinanzeigen",
+  "repository": {
+    "url": "https://github.com/taneron/willmehr",
+    "source": "github",
+    "id": "1319841057"
+  },
+  "packages": [
+    {
+      "registry_type": "npm",
+      "registry_base_url": "https://registry.npmjs.org",
+      "identifier": "kleinanzeigen-mcp",
+      "version": "0.1.0",
+      "runtime_hint": "npx",
+      "transport": { "type": "stdio" },
+      "environment_variables": [
+        {
+          "name": "WILLMEHR_MODE",
+          "description": "'full' (default) for a local install; 'public' paces requests and lowers the page and batch caps for an instance shared by several people.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "full",
+          "choices": ["full", "public"]
+        },
+        {
+          "name": "KZ_MIN_INTERVAL_MS",
+          "description": "Minimum spacing between requests to kleinanzeigen.de, in milliseconds. Concurrency trips the site's bot detection, so requests are serialised.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "800"
+        },
+        {
+          "name": "KZ_MAX_PAGE_COUNT",
+          "description": "Cap on result pages a single search may fetch, roughly 25 listings each.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "5"
+        },
+        {
+          "name": "KZ_MAX_BATCH_SIZE",
+          "description": "Cap on listing ids per batch detail call.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "20"
+        },
+        {
+          "name": "TZ",
+          "description": "Listing timestamps are printed without a timezone; set Europe/Berlin to interpret them exactly.",
+          "is_required": false,
+          "is_secret": false
+        }
+      ]
+    }
+  ]
+}

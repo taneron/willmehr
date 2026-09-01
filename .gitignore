@@ -4,3 +4,4 @@ dist/
 *.har
 .DS_Store
 .playwright-mcp/
+build/

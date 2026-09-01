@@ -11,12 +11,23 @@ Two servers ship from this repo, each registered separately:
 | `willmehr` | [willhaben.at](https://www.willhaben.at) (Austria) | `dist/index.js` |
 | `kleinanzeigen-mcp` | [kleinanzeigen.de](https://www.kleinanzeigen.de) (Germany) | `dist/kleinanzeigen/index.js` |
 
+They publish as two npm packages, [`willmehr`](https://www.npmjs.com/package/willmehr)
+and [`kleinanzeigen-mcp`](https://www.npmjs.com/package/kleinanzeigen-mcp), released
+together from this repo at the same version.
+
 The willhaben server was built by reverse-engineering the willhaben web app's own JSON
 API from a HAR capture. The Kleinanzeigen server is a port of
 [`jnslmk/kleinanzeigen-mcp`](https://github.com/jnslmk/kleinanzeigen-mcp) — see
 [Kleinanzeigen](#kleinanzeigen) below.
 
 ## Quick start
+
+```bash
+claude mcp add willmehr -- npx -y willmehr
+claude mcp add kleinanzeigen -- npx -y kleinanzeigen-mcp
+```
+
+Or from a clone, which is what you want for hacking on it or self-hosting:
 
 ```bash
 git clone https://github.com/taneron/willmehr.git && cd willmehr
@@ -26,7 +37,7 @@ claude mcp add willmehr -- node "$PWD/dist/index.js"
 claude mcp add kleinanzeigen -- node "$PWD/dist/kleinanzeigen/index.js"
 ```
 
-That gives you both servers locally, in `full` mode. The willhaben account tools need
+Either way you get both servers locally, in `full` mode. The willhaben account tools need
 a session cookie of your own — see [Authentication](#authentication); everything else
 works anonymously and needs no setup.
 
@@ -88,9 +99,23 @@ Four account tools, requiring a session cookie:
 ## Install
 
 ```bash
+claude mcp add willmehr -- npx -y willmehr
+```
+
+Or from source:
+
+```bash
 npm install
 npm run build
+npm run pack:kz                      # stage build/kleinanzeigen-mcp for publishing
 ```
+
+`willmehr` publishes from the repo root. `kleinanzeigen-mcp` publishes from
+`build/kleinanzeigen-mcp`, staged by `npm run pack:kz` — it copies the built output the
+Kleinanzeigen entry point reaches (its own directory plus the shared mode module) and
+generates a manifest around it, so both packages ship the same commit at the same
+version. `server.json` and `server.kleinanzeigen.json` are the matching MCP registry
+entries.
 
 Register it with Claude Code:
 
@@ -250,6 +275,14 @@ The intended flow is `kleinanzeigen_search` → pick interesting ids →
 text, so a broad search does not blow up the model's context window.
 
 ## Install
+
+Its own package, so it installs without the willhaben half:
+
+```bash
+claude mcp add kleinanzeigen -- npx -y kleinanzeigen-mcp
+```
+
+Or from source:
 
 ```bash
 npm install && npm run build
