@@ -1,6 +1,15 @@
+willmehr bundles work by others. Their notices, retained as their licenses
+require:
+
+## src/kleinanzeigen/
+
+A TypeScript port of https://github.com/jnslmk/kleinanzeigen-mcp
+
+MIT License:
+
 MIT License
 
-Copyright (c) 2026 Taner
+Copyright (c) 2026 Jonas Lemke
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

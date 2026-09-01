@@ -461,7 +461,7 @@ site's markup moved.
 
 MIT — see [LICENSE](LICENSE). The Kleinanzeigen server is a port of
 [`jnslmk/kleinanzeigen-mcp`](https://github.com/jnslmk/kleinanzeigen-mcp) (MIT,
-© Jonas Lemke), whose notice the LICENSE file carries.
+© Jonas Lemke), whose notice is kept in [NOTICE](NOTICE).
 
 Neither site endorses this. It reads public pages and the willhaben web app's own JSON
 API at a deliberately slow pace; if you host it for others, read
