@@ -37,7 +37,10 @@ claude mcp add willmehr -- node "$PWD/dist/index.js"
 claude mcp add kleinanzeigen -- node "$PWD/dist/kleinanzeigen/index.js"
 ```
 
-Either way you get both servers locally, in `full` mode. The willhaben account tools need
+Either way you get both servers locally, in `full` mode. Both are listed in the
+official MCP registry, as `io.github.taneron/willmehr` and
+`io.github.taneron/kleinanzeigen`, so a client that reads the registry can find them
+without this README. The willhaben account tools need
 a session cookie of your own — see [Authentication](#authentication); everything else
 works anonymously and needs no setup.
 
