@@ -1,0 +1,20 @@
+# TLS is automatic: point MCP_HOSTNAME's A record at this box and Caddy gets a
+# Let's Encrypt certificate on first boot.
+{$MCP_HOSTNAME} {
+	encode zstd gzip
+
+	# The app already 404s unknown paths with a JSON-RPC error, so everything
+	# goes through and routing stays in one place.
+	reverse_proxy mcp:8080 {
+		# Tool calls fan out into several upstream page fetches behind one
+		# global queue; the default 5s read timeout would cut them off.
+		transport http {
+			read_timeout 180s
+		}
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

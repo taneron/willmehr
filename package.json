@@ -1,0 +1,37 @@
+{
+  "name": "willmehr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP servers for hunting deals on willhaben.at and kleinanzeigen.de",
+  "type": "module",
+  "bin": {
+    "willmehr": "dist/index.js",
+    "kleinanzeigen-mcp": "dist/kleinanzeigen/index.js",
+    "willmehr-http": "dist/serve-http.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx scripts/smoke.ts",
+    "session": "tsx scripts/session.ts",
+    "check:auth": "tsx scripts/check-auth.ts",
+    "smoke:kz": "tsx scripts/smoke-kleinanzeigen.ts",
+    "serve": "node dist/serve-http.js",
+    "serve:dev": "tsx src/serve-http.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "node-html-parser": "^9.0.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.8.0"
+  }
+}

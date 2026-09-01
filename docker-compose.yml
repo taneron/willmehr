@@ -1,0 +1,40 @@
+# Public-mode MCP host behind Caddy, which terminates TLS and gets the
+# certificate. Only Caddy is published; the app listens on the private network.
+services:
+  mcp:
+    build: .
+    restart: unless-stopped
+    environment:
+      # Caddy sets X-Forwarded-For, so the rate limiter must read it — without
+      # this every request looks like it comes from the proxy's container IP
+      # and one user's burst rate-limits everybody.
+      TRUST_PROXY: "1"
+      MCP_ALLOWED_HOSTS: ${MCP_HOSTNAME}
+      # Kleinanzeigen prints timezone-less dates; pin the interpretation.
+      TZ: Europe/Berlin
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - mcp
+    environment:
+      MCP_HOSTNAME: ${MCP_HOSTNAME}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
