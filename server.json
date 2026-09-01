@@ -1,0 +1,51 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.taneron/willmehr",
+  "description": "Search willhaben.at for second-hand listings and rank the underpriced ones",
+  "status": "active",
+  "version": "0.1.0",
+  "website_url": "https://github.com/taneron/willmehr#readme",
+  "repository": {
+    "url": "https://github.com/taneron/willmehr",
+    "source": "github",
+    "id": "1319841057"
+  },
+  "packages": [
+    {
+      "registry_type": "npm",
+      "registry_base_url": "https://registry.npmjs.org",
+      "identifier": "willmehr",
+      "version": "0.1.0",
+      "runtime_hint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environment_variables": [
+        {
+          "name": "WILLMEHR_MODE",
+          "description": "'full' (default) registers the account tools; 'public' runs anonymously, reads no credential and paces requests for a shared IP.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "full",
+          "choices": [
+            "full",
+            "public"
+          ]
+        },
+        {
+          "name": "WILLHABEN_COOKIE",
+          "description": "Session cookie from a logged-in willhaben browser session, needed only by the willhaben_my_* tools. Must contain BBX_JSESSIONID and x-bbx-csrf-token. Sessions expire within roughly half an hour.",
+          "is_required": false,
+          "is_secret": true
+        },
+        {
+          "name": "WILLHABEN_MIN_INTERVAL_MS",
+          "description": "Minimum spacing between requests to willhaben, in milliseconds.",
+          "is_required": false,
+          "is_secret": false,
+          "default": "400"
+        }
+      ]
+    }
+  ]
+}

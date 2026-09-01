@@ -1,16 +1,38 @@
 {
   "name": "willmehr",
   "version": "0.1.0",
-  "private": true,
   "description": "MCP servers for hunting deals on willhaben.at and kleinanzeigen.de",
+  "mcpName": "io.github.taneron/willmehr",
+  "license": "MIT",
+  "author": "Taner (https://github.com/taneron)",
+  "homepage": "https://github.com/taneron/willmehr#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taneron/willmehr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/taneron/willmehr/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "willhaben",
+    "kleinanzeigen",
+    "classifieds",
+    "claude"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=20.12"
+  },
   "bin": {
     "willmehr": "dist/index.js",
     "kleinanzeigen-mcp": "dist/kleinanzeigen/index.js",
     "willmehr-http": "dist/serve-http.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsc",
@@ -22,7 +44,8 @@
     "check:auth": "tsx scripts/check-auth.ts",
     "smoke:kz": "tsx scripts/smoke-kleinanzeigen.ts",
     "serve": "node dist/serve-http.js",
-    "serve:dev": "tsx src/serve-http.ts"
+    "serve:dev": "tsx src/serve-http.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
