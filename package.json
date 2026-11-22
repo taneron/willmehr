@@ -45,6 +45,7 @@
     "smoke:kz": "tsx scripts/smoke-kleinanzeigen.ts",
     "serve": "node dist/serve-http.js",
     "serve:dev": "tsx src/serve-http.ts",
+    "prepare": "tsc",
     "prepublishOnly": "npm run build",
     "pack:kz": "npm run build && node scripts/pack-kleinanzeigen.mjs"
   },
