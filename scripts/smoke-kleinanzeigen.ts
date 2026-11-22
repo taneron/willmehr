@@ -41,13 +41,17 @@ check("refuses page count off page 1", parsePageCount("26 - 50 von 564 Ergebniss
 
 check("builds search url",
   buildSearchUrl({ query: "thinkpad", location: "Berlin", minPrice: 100, maxPrice: 400 }, 2) ===
-    "https://www.kleinanzeigen.de/preis:100:400/s-seite:2?keywords=thinkpad&locationStr=Berlin");
+    "https://www.kleinanzeigen.de/s-seite:2/preis:100:400?keywords=thinkpad&locationStr=Berlin");
 check("injects page into category url",
   injectPage("https://www.kleinanzeigen.de/s-notebooks/c278", 2) ===
     "https://www.kleinanzeigen.de/s-notebooks/seite:2/c278");
 check("injects page into keyword url",
   injectPage("https://www.kleinanzeigen.de/s-seite:5?keywords=thinkpad", 2) ===
     "https://www.kleinanzeigen.de/s-seite:2?keywords=thinkpad");
+
+check("moves page before price in keyword url",
+  injectPage("https://www.kleinanzeigen.de/preis::100/s-seite:3?keywords=thinkpad", 2) ===
+    "https://www.kleinanzeigen.de/s-seite:2/preis::100?keywords=thinkpad");
 
 const parsed = parseSearchUrl(
   "https://www.kleinanzeigen.de/s-wohnwagen-mobile/berlin/preis:1000:15000/seite:2/k0c220+wohnwagen.art_s:wohnwagen+wohnwagen.marke_s:(fendt,knaus)+wohnwagen.ez_i:2008,",

@@ -45,7 +45,9 @@ export interface SearchOptions {
 export function buildSearchUrl(filters: SearchFilters, page = 1): string {
   const { query, location, radiusKm, minPrice, maxPrice } = filters;
 
-  // Price is a path segment, not a query parameter: /preis:100:400
+  // Price is a path segment, not a query parameter: /s-seite:1/preis:100:400.
+  // It has to come after the page segment: with the price first, the new
+  // results frontend serves a page without any listing markup.
   const pricePath =
     minPrice !== undefined || maxPrice !== undefined
       ? `/preis:${minPrice ?? ""}:${maxPrice ?? ""}`
@@ -57,7 +59,7 @@ export function buildSearchUrl(filters: SearchFilters, page = 1): string {
   if (radiusKm !== undefined) params.set("radius", String(radiusKm));
 
   const search = params.toString();
-  return `${ORIGIN}${pricePath}/s-seite:${page}${search ? `?${search}` : ""}`;
+  return `${ORIGIN}/s-seite:${page}${pricePath}${search ? `?${search}` : ""}`;
 }
 
 /**
@@ -73,8 +75,13 @@ export function injectPage(url: string, page: number): string {
     .split("/")
     .filter((segment) => segment && !/^s?-?seite:\d+$/.test(segment) && !/^s-seite:\d+$/.test(segment));
 
-  if (page > 1) {
-    const filterIndex = segments.findIndex((segment) => /^k?\d*c\d+/.test(segment));
+  const filterIndex = segments.findIndex((segment) => /^k?\d*c\d+/.test(segment));
+  const priceIndex = segments.findIndex((segment) => /^preis:/.test(segment));
+  if (filterIndex === -1 && priceIndex !== -1) {
+    // Keyword search with a price: the page segment must precede the price,
+    // otherwise the site serves a page without listing markup.
+    segments.splice(priceIndex, 0, `s-seite:${page}`);
+  } else if (page > 1) {
     if (filterIndex === -1) segments.push(`s-seite:${page}`);
     else segments.splice(filterIndex, 0, `seite:${page}`);
   }
@@ -131,7 +138,9 @@ async function walkPages(
     pagesFetched++;
 
     const root = parse(html);
-    const summary = collapse(root.querySelector(".breadcrump-summary")?.text ?? "");
+    const summary = collapse(
+      (root.querySelector("#srp-breadcrumb-summary") ?? root.querySelector(".breadcrump-summary"))?.text ?? "",
+    );
     if (page === 1) {
       totalFound = parseTotalResults(summary);
       availablePages = parsePageCount(summary);
@@ -162,13 +171,91 @@ function keep(listing: ListingSummary, cutoff: number): boolean {
 /**
  * Pull the listing cards out of a results page.
  *
- * Top ads (`is-topad`) and the pro-seller promo card are paid placements that
- * repeat on every page, so they are skipped — otherwise a three-page search
- * returns the same sponsored ads three times.
+ * Top ads and the pro-seller promo card are paid placements that repeat on
+ * every page, so they are skipped — otherwise a three-page search returns the
+ * same sponsored ads three times.
+ *
+ * Kleinanzeigen moved its results page to a new (Tailwind/Astro) frontend in
+ * autumn 2026. The legacy markup (`li.ad-listitem`, `.aditem-*` classes) is
+ * still parsed as a fallback in case old pages are served to some clients.
  */
 export function extractListings(root: HTMLElement): ListingSummary[] {
-  const listings: ListingSummary[] = [];
   const now = new Date();
+  if (root.querySelector("li.ad-listitem")) return extractLegacyListings(root, now);
+  return extractCardListings(root, now);
+}
+
+function extractCardListings(root: HTMLElement, now: Date): ListingSummary[] {
+  const listings: ListingSummary[] = [];
+  const seen = new Set<string>();
+
+  for (const article of root.querySelectorAll("article[data-adid]")) {
+    const id = article.getAttribute("data-adid");
+    const href = article.getAttribute("data-href");
+    if (!id || !href || seen.has(id)) continue;
+
+    // Top ads carry a corner badge: an <svg> that is a direct child of the card's <li>.
+    const card = article.closest("li");
+    if (card?.childNodes.some((node) => (node as HTMLElement).rawTagName === "svg")) continue;
+    seen.add(id);
+
+    const body = article.childNodes.filter((node) => (node as HTMLElement).rawTagName === "div")[1] as
+      | HTMLElement
+      | undefined;
+    if (!body) continue;
+    const blocks = body.childNodes.filter((node) => (node as HTMLElement).rawTagName === "div") as HTMLElement[];
+    const [topRow, main, ...rest] = blocks;
+
+    // Top row: one cell with the locality ("10405 Prenzlauer Berg", "(3 km)"),
+    // one with the date. Top ads have no date cell.
+    let localityText = "";
+    let publishedAt: string | null = null;
+    for (const cell of topRow?.querySelectorAll(":scope > div") ?? []) {
+      const text = cell
+        .querySelectorAll("span")
+        .map((span) => collapse(span.text))
+        .filter(Boolean)
+        .join(" ");
+      const date = parseListingDate(text, now);
+      if (date) publishedAt = date;
+      else if (!localityText) localityText = text;
+    }
+    const locality = parseLocality(localityText);
+
+    const title = collapse(main?.querySelector("h3")?.text ?? main?.querySelector("h2")?.text ?? "");
+    const paragraphs = main?.querySelectorAll(":scope > p") ?? [];
+    const description = collapse(paragraphs[0]?.text ?? "");
+    const price = parsePrice(main?.querySelector(":scope > div > p")?.text);
+
+    const tags = rest
+      .flatMap((block) => block.querySelectorAll("p span"))
+      .map((tag) => collapse(tag.text))
+      .filter(Boolean);
+    if (rest.some((block) => /\bPRO\b/.test(block.text))) tags.push("PRO");
+
+    const image = article.querySelector("img");
+    listings.push({
+      id,
+      url: `${ORIGIN}${href}`,
+      title,
+      price: { amount: price.amount, label: price.label, negotiable: price.negotiable },
+      description,
+      postcode: locality.postcode,
+      city: locality.city,
+      distanceKm: locality.distanceKm,
+      publishedAt,
+      wanted: tags.some((tag) => /^Gesuch$/i.test(tag)),
+      shippingPossible: tags.some((tag) => /Versand möglich/i.test(tag)),
+      tags,
+      thumbnailUrl: image?.getAttribute("src") ?? null,
+    });
+  }
+
+  return listings;
+}
+
+function extractLegacyListings(root: HTMLElement, now: Date): ListingSummary[] {
+  const listings: ListingSummary[] = [];
 
   for (const item of root.querySelectorAll("li.ad-listitem")) {
     const classes = item.classList;
